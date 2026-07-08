@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:whatsapp_project/main_screen.dart';
+import 'package:whatsapp_project/modules/dashboard/dashboard_screen.dart';
+import 'package:whatsapp_project/modules/login/login_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
           surfaceTint: Colors.white,
         ),
       ),
-      home: MainScreen(),
+      home: LoginScreen(),
     );
   }
 }
