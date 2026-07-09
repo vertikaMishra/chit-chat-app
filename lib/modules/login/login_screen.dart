@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:sign_in_button/sign_in_button.dart';
+import 'package:whatsapp_project/modules/login/login_Controller.dart';
 
 /// Created by Vertika Mishra
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+    LoginScreen({super.key});
+ final LoginController controller=LoginController();
 
   @override
   Widget build(BuildContext context) {
@@ -47,23 +50,16 @@ class LoginScreen extends StatelessWidget {
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
             ),
           ),
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(22,60,0,0),
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    fixedSize: WidgetStatePropertyAll(Size(480,60)),
-                    backgroundColor: WidgetStatePropertyAll(Colors.tealAccent),
-                    foregroundColor: WidgetStatePropertyAll(Colors.black),
-                    textStyle: WidgetStatePropertyAll(TextStyle(fontSize: 30)),
-                  ),
-                  child: Text("Login here!"),
-                ),
-              ),
-            ],
+          Spacer(),
+          SizedBox(
+            height: 56,
+            width: 280,
+            child: SignInButton(Buttons.googleDark, onPressed: () {
+              controller.signInWithGoogle(context);
+            },),
           ),
+          Spacer(),
+          Spacer(),
         ],
       ),
     );
