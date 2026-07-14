@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp_project/firebase_options.dart';
+import 'package:whatsapp_project/modules/dashboard/dashboard_screen.dart';
 import 'package:whatsapp_project/modules/login/login_screen.dart';
+import 'package:whatsapp_project/routes/app_routes.dart';
+import 'package:whatsapp_project/routes/app_screens.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +27,8 @@ class MyApp extends StatelessWidget {
           surfaceTint: Colors.white,
         ),
       ),
-      home: LoginScreen(),
+      routes: appRoutes,
+      initialRoute: FirebaseAuth.instance.currentUser==null?AppScreens.home:AppScreens.login,
     );
   }
 }

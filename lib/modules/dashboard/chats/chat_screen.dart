@@ -1,20 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp_project/modules/dashboard/chats/chat_cantroller.dart';
+import 'package:whatsapp_project/modules/login/login_screen.dart';
 
 import '../dashboard_screen.dart';
 import '../../../models/contact_item.dart';
 
 class ChatScreen extends StatelessWidget {
-  ChatScreen({
-    super.key,
-  });
-  
+  ChatScreen({super.key});
+
   final chatCantroller = ChatCantroller();
 
-
   @override
-  
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -57,18 +55,66 @@ class ChatScreen extends StatelessWidget {
             color: Colors.black,
           ),
           SizedBox(width: 30),
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: Icon(
-              Icons.more_vert,
-              size: 30,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, size: 30, color: Colors.black),
+            position: PopupMenuPosition.under,
+            onSelected: (value) async {
+              switch(value){
+                case 'Profile':
+                  break;
+                case 'Settings':
+                  break;
+                case 'Log out':
+                  try{
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacement(
+                        context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),);
+                  }
+                  catch(e){
+                    debugPrint('Logout error:$e');
+                  }
+                  break;
+              }
+            },
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'Profile',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person_outline),
+                      SizedBox(width: 12),
+                      Text('Profile'),
+                    ],
+                  ),
+                ), PopupMenuItem<String>(
+                  value: 'Settings',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person_outline),
+                      SizedBox(width: 12),
+                      Text('Settings'),
+                    ],
+                  ),
+                ),
+                PopupMenuDivider(),
+                PopupMenuItem<String>(
+                  value: 'Log out',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person_outline),
+                      SizedBox(width: 12),
+                      Text('Log out'),
+                    ],
+                  ),
+                ),
+              ];
+            },
           ),
         ],
       ),
-      body:  Column(
+      body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 5, 12, 5),
@@ -103,7 +149,7 @@ class ChatScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 12, 0, 2),
             child: SingleChildScrollView(
-              scrollDirection:Axis.horizontal,
+              scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   SizedBox(width: 25),
@@ -209,15 +255,20 @@ class ChatScreen extends StatelessWidget {
             child: FutureBuilder(
               future: chatCantroller.getContactList(),
               builder: (context, asyncSnapshot) {
-                if(asyncSnapshot.connectionState==ConnectionState.waiting){
-                  return CircularProgressIndicator();
+                print("=> ${asyncSnapshot.data}");
+                if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      constraints:BoxConstraints(minHeight: 36,minWidth: 36),
+                    ),
+                  );
                 }
-                final data = asyncSnapshot.data??[];
+                final data = asyncSnapshot.data ?? [];
                 return ListView.builder(
                   itemCount: data.length,
                   itemBuilder: (context, index) {
                     Contact item = data[index];
-                
+
                     return Padding(
                       padding: const EdgeInsets.all(20),
                       child: Row(
@@ -227,16 +278,20 @@ class ChatScreen extends StatelessWidget {
                             height: 70,
                             child: CachedNetworkImage(
                               imageUrl: item.image,
-                              imageBuilder: (context, imageProvider) => Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.green, width: 4),
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: imageProvider,
-                                    fit: BoxFit.cover,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.green,
+                                        width: 4,
+                                      ),
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
                               placeholder: (context, url) =>
                                   CircularProgressIndicator(),
                               errorWidget: (context, url, error) =>
@@ -260,14 +315,17 @@ class ChatScreen extends StatelessWidget {
                           Spacer(),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 38),
-                            child: Text(item.time, style: TextStyle(fontSize: 12)),
+                            child: Text(
+                              item.time,
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
                         ],
                       ),
                     );
                   },
                 );
-              }
+              },
             ),
           ),
         ],

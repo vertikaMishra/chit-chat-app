@@ -12,27 +12,13 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFFBCD6BD),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 80),
-            child: Container(
-              width: double.infinity,
-              height: 600,
-              child: CachedNetworkImage(
-                imageUrl:
-                    "https://static.vecteezy.com/system/resources/previews/016/900/444/non_2x/online-dating-app-login-illustration-valentine-s-day-love-match-mobile-leaves-gradient-character-illustration-vector.jpg",
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
+
+          Expanded(
+            child: Image.asset(
+               "images/ChitChatnewt.jpg.png"
             ),
           ),
           Text(
@@ -50,7 +36,7 @@ class LoginScreen extends StatelessWidget {
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
             ),
           ),
-          Spacer(),
+          SizedBox(height: 56),
           SizedBox(
             height: 56,
             width: 280,
@@ -58,8 +44,7 @@ class LoginScreen extends StatelessWidget {
               controller.signInWithGoogle(context);
             },),
           ),
-          Spacer(),
-          Spacer(),
+          SizedBox(height: 56),
         ],
       ),
     );

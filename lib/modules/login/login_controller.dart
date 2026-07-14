@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:whatsapp_project/modules/dashboard/dashboard_screen.dart';
+import 'package:whatsapp_project/routes/app_screens.dart';
 
 class LoginController {
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
@@ -21,9 +22,9 @@ class LoginController {
       credential,
     );
     if (userCredential.user != null && context.mounted == true) {
-      Navigator.push(
+      Navigator.pushReplacementNamed(
         context,
-        MaterialPageRoute(builder: (context) => DashboardScreen()),
+        AppScreens.home
       );
     }
     else{
