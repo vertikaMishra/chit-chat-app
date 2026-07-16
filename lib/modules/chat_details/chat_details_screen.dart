@@ -12,65 +12,30 @@ class ChatDetailsScreen extends GetView<ChatDetailsController> {
     return Scaffold(
       backgroundColor: Color(0xFFC8E6C9),
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: CircleAvatar(),
-        ),
-        title: Text("Vartika", style: TextStyle(fontSize: 30)),
-        actions: [
-          Icon(Icons.videocam, size: 30),
-          SizedBox(width: 25),
-          Icon(Icons.call_outlined, size: 30),
-          SizedBox(width: 25),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: Icon(Icons.more_vert, size: 30),
-          ),
-        ],
+        backgroundColor: Colors.teal,
+        foregroundColor: Colors.white,
+        title: Text(controller.contact.name),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.call))],
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.white,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(9.0),
-                    child: Text(
-                      "hey whats up!!",
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(9.0),
-
-                margin: EdgeInsets.only(right: 16),
-                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+      body: Obx(() {
+        return controller.messageList.value.when(
+          none: () => SizedBox.shrink(),
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (msg) => Text(msg),
+          success: (data) => ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              return Container(
+                decoration: BoxDecoration(
                   color: Colors.white,
+                  borderRadius: BorderRadiusGeometry.circular(16),
                 ),
-                child: Text(
-                  "Good morning!",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
-              ),
-            ],
+                child: Text("Message"),
+              );
+            },
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }
