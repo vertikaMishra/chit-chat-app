@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:whatsapp_project/modules/chat_details/chat_details_controller.dart';
 
 /// Created by Vertika Mishra
 
-class ChatDetailsScreen extends StatelessWidget {
+class ChatDetailsScreen extends GetView<ChatDetailsController> {
   const ChatDetailsScreen({super.key});
 
   @override

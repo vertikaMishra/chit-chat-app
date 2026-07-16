@@ -269,7 +269,7 @@ class ChatScreen extends GetView<ChatCantroller>{
 
                     return InkWell(
                       onTap: () {
-                        Get.toNamed(AppScreens.chatDetails);
+                        Get.toNamed(AppScreens.chatDetails,arguments:item);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(20),
