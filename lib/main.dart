@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:whatsapp_project/firebase_options.dart';
 import 'package:whatsapp_project/modules/dashboard/dashboard_screen.dart';
 import 'package:whatsapp_project/modules/login/login_screen.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Whatsapp",
       theme: ThemeData(
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: appRoutes,
-      initialRoute: FirebaseAuth.instance.currentUser==null?AppScreens.home:AppScreens.login,
+      initialRoute: FirebaseAuth.instance.currentUser==null?AppScreens.login:AppScreens.home,
     );
   }
 }

@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 import 'package:whatsapp_project/modules/login/login_Controller.dart';
 
 /// Created by Vertika Mishra
 
-class LoginScreen extends StatelessWidget {
-    LoginScreen({super.key});
- final LoginController controller=LoginController();
+class LoginScreen extends GetView<LoginController> {
+    const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,16 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:whatsapp_project/modules/dashboard/chats/chat_cantroller.dart';
 import 'package:whatsapp_project/modules/login/login_screen.dart';
+import 'package:whatsapp_project/routes/app_screens.dart';
 
 import '../dashboard_screen.dart';
 import '../../../models/contact_item.dart';
 
-class ChatScreen extends StatelessWidget {
-  ChatScreen({super.key});
-
-  final chatCantroller = ChatCantroller();
+class ChatScreen extends GetView<ChatCantroller>{
+  const ChatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,19 +59,19 @@ class ChatScreen extends StatelessWidget {
             icon: const Icon(Icons.more_vert, size: 30, color: Colors.black),
             position: PopupMenuPosition.under,
             onSelected: (value) async {
-              switch(value){
+              switch (value) {
                 case 'Profile':
                   break;
                 case 'Settings':
                   break;
                 case 'Log out':
-                  try{
+                  try {
                     await FirebaseAuth.instance.signOut();
                     Navigator.pushReplacement(
-                        context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),);
-                  }
-                  catch(e){
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  } catch (e) {
                     debugPrint('Logout error:$e');
                   }
                   break;
@@ -88,7 +88,8 @@ class ChatScreen extends StatelessWidget {
                       Text('Profile'),
                     ],
                   ),
-                ), PopupMenuItem<String>(
+                ),
+                PopupMenuItem<String>(
                   value: 'Settings',
                   child: Row(
                     children: [
@@ -252,81 +253,83 @@ class ChatScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: FutureBuilder(
-              future: chatCantroller.getContactList(),
-              builder: (context, asyncSnapshot) {
-                print("=> ${asyncSnapshot.data}");
-                if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      constraints:BoxConstraints(minHeight: 36,minWidth: 36),
-                    ),
-                  );
-                }
-                final data = asyncSnapshot.data ?? [];
-                return ListView.builder(
+            child: Obx(() {
+              return controller.contactList.value.when(
+                none: () => SizedBox.shrink(),
+                loading: () => Center(
+                  child: CircularProgressIndicator(
+                    constraints: BoxConstraints(minHeight: 36, minWidth: 36),
+                  ),
+                ),
+                error: (msg) => Text(msg),
+                success: (data) => ListView.builder(
                   itemCount: data.length,
                   itemBuilder: (context, index) {
                     Contact item = data[index];
 
-                    return Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 70,
-                            height: 70,
-                            child: CachedNetworkImage(
-                              imageUrl: item.image,
-                              imageBuilder: (context, imageProvider) =>
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.green,
-                                        width: 4,
-                                      ),
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
+                    return InkWell(
+                      onTap: () {
+                        Get.toNamed(AppScreens.chatDetails);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 70,
+                              height: 70,
+                              child: CachedNetworkImage(
+                                imageUrl: item.image,
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.green,
+                                          width: 4,
+                                        ),
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.name,
+                                    style: TextStyle(fontWeight: FontWeight.w700),
                                   ),
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
+                                  SizedBox(height: 5),
+                                  Text(item.message),
+                                ],
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: TextStyle(fontWeight: FontWeight.w700),
-                                ),
-                                SizedBox(height: 5),
-                                Text(item.message),
-                              ],
+                            Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 38),
+                              child: Text(
+                                item.time,
+                                style: TextStyle(fontSize: 12),
+                              ),
                             ),
-                          ),
-                          Spacer(),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 38),
-                            child: Text(
-                              item.time,
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ),
         ],
       ),

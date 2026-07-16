@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:whatsapp_project/modules/dashboard/dashboard_screen.dart';
 import 'package:whatsapp_project/routes/app_screens.dart';
 
-class LoginController {
+class LoginController extends GetxController {
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
 
   Future<void> signInWithGoogle(BuildContext context) async {
