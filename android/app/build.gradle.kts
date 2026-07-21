@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ChitChat"
+    namespace = "com.example.chitchat"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

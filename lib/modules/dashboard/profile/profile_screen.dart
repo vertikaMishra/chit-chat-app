@@ -9,7 +9,7 @@ class ProfileScreen extends GetView<DashboardController>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body:SingleChildScrollView(child:  Column(
         children: [
           Center(
             child: Padding(
@@ -60,9 +60,15 @@ class ProfileScreen extends GetView<DashboardController>{
             title: "LogOut",
             subtitle: "Anytime",
             icon: Icons.login_outlined,
+          ),buildProfileTile(
+            title: "Username",
+            subtitle: "create privacy",
+            icon: Icons.drive_file_rename_outline_outlined,
+            onTap: () => showUsernameSheet(),
           ),
+
         ],
-      ),
+      ),)
     );
   }
 
@@ -168,6 +174,69 @@ class ProfileScreen extends GetView<DashboardController>{
                         ),
                       ],
                     ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  void showUsernameSheet() {
+
+    final usernameController = TextEditingController();
+    Get.bottomSheet(
+      SafeArea(
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(Get.context!).size.height * .7,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+          ),
+          child: Column(
+            children: [
+              Text("update username", style: TextStyle(fontSize: 25)),
+              Divider(),
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller:usernameController,
+                        decoration: InputDecoration(
+                          labelText: "UserName",
+                          hintText: "Enter username",
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                        validator:(value) => (value?.trim().length ?? 0) >=5?null
+                            :"please enter a valid username",
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (usernameController.text.trim().length>=5){
+                           controller.checkUpdateUserName(usernameController.text.trim());
+                          }
+                          else{
+                            Get.snackbar(
+                              'Error',
+                              "Enter valid username",
+                              snackPosition: SnackPosition.BOTTOM,
+                              overlayColor: Colors.red,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          }
+                        },
+                        child: Text("update", style: TextStyle(fontSize: 22)),
+                      ),
+                    ],
                   ),
                 ),
               ),

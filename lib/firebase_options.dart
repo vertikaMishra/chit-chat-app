@@ -47,32 +47,33 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC2maNV8EqljgdQ3vop2F0BLRO1GGPUNj0',
-    appId: '1:619779037573:web:63a532a1123f7af73c4cec',
-    messagingSenderId: '619779037573',
-    projectId: 'chit-chat-ed913',
-    authDomain: 'chit-chat-ed913.firebaseapp.com',
-    databaseURL: 'https://chit-chat-ed913-default-rtdb.firebaseio.com',
-    storageBucket: 'chit-chat-ed913.firebasestorage.app',
-    measurementId: 'G-2MFQDB5119',
+    apiKey: 'AIzaSyAndNWMojnqA-h5xAR8Lk2G_KXZToBOQzs',
+    appId: '1:394559626532:web:9ce188edbcc2f46ceae7b1',
+    messagingSenderId: '394559626532',
+    projectId: 'chitchat-5a45f',
+    authDomain: 'chitchat-5a45f.firebaseapp.com',
+    databaseURL: 'https://chitchat-5a45f-default-rtdb.firebaseio.com',
+    storageBucket: 'chitchat-5a45f.firebasestorage.app',
+    measurementId: 'G-04KJCH0GTJ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCKGRbL0amVNAyNp6uaTu_6e1UV23227gA',
-    appId: '1:619779037573:android:5958e9567a1a0dbe3c4cec',
-    messagingSenderId: '619779037573',
-    projectId: 'chit-chat-ed913',
-    databaseURL: 'https://chit-chat-ed913-default-rtdb.firebaseio.com',
-    storageBucket: 'chit-chat-ed913.firebasestorage.app',
+    apiKey: 'AIzaSyCf5xQzh55UPRjlhNvNqQf-9QOHlmBnVAM',
+    appId: '1:394559626532:android:28e9a6c8b1e718f1eae7b1',
+    messagingSenderId: '394559626532',
+    projectId: 'chitchat-5a45f',
+    databaseURL: 'https://chitchat-5a45f-default-rtdb.firebaseio.com',
+    storageBucket: 'chitchat-5a45f.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD37-49myVs88tZVHlzpT34ytHFDf3Kvy8',
-    appId: '1:619779037573:ios:c40b0c00991611813c4cec',
-    messagingSenderId: '619779037573',
-    projectId: 'chit-chat-ed913',
-    databaseURL: 'https://chit-chat-ed913-default-rtdb.firebaseio.com',
-    storageBucket: 'chit-chat-ed913.firebasestorage.app',
-    iosClientId: '619779037573-sgtsh5v3n521jgvnqjvd5kkoenvi9b1d.apps.googleusercontent.com',
+    apiKey: 'AIzaSyB2FJgr9JXuQPS_Z7Ixf0yINAnEdcZwTOI',
+    appId: '1:394559626532:ios:8c7df4292c00a289eae7b1',
+    messagingSenderId: '394559626532',
+    projectId: 'chitchat-5a45f',
+    databaseURL: 'https://chitchat-5a45f-default-rtdb.firebaseio.com',
+    storageBucket: 'chitchat-5a45f.firebasestorage.app',
+    androidClientId: '394559626532-g3ctenrjtuks1nieo14do30gohdbejug.apps.googleusercontent.com',
+    iosClientId: '394559626532-ou8etbcfkcicst60vj7k34nssoaukerf.apps.googleusercontent.com',
     iosBundleId: 'com.example.whatsappProject',
   );
 }
