@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:whatsapp_project/modules/dashboard/calls/calls_screen.dart';
 import 'package:whatsapp_project/modules/dashboard/communities/communities_screen.dart';
+import 'package:whatsapp_project/modules/dashboard/profile/profile_screen.dart';
 import 'package:whatsapp_project/modules/dashboard/updates/updates_screen.dart';
 
 import 'chats/chat_screen.dart';
@@ -23,7 +23,7 @@ class DashboardScreen extends StatelessWidget {
             ChatScreen(),
             UpdatesScreen(),
             CommunitiesScreen(),
-            CallsScreen(),
+            ProfileScreen(),
           ],
         );
       }),
@@ -55,9 +55,9 @@ class DashboardScreen extends StatelessWidget {
               activeIcon: Icon(Icons.groups, color: Colors.green),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.call_outlined, size: 30),
-              label: "Calls",
-              activeIcon: Icon(Icons.call, color: Colors.green),
+              icon: Icon(Icons.person_outlined, size: 30),
+              label: "Profile",
+              activeIcon: Icon(Icons.person, color: Colors.green),
             ),
           ],
         );

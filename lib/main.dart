@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           surfaceTint: Colors.white,
         ),
       ),
-      routes: appRoutes,
+      getPages: appRoutes,
       initialRoute: FirebaseAuth.instance.currentUser==null?AppScreens.login:AppScreens.home,
     );
   }

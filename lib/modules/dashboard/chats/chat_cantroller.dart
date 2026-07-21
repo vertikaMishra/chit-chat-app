@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,22 +10,31 @@ import '../../../models/contact_item.dart';
 
 /// Created by Vertika Mishra
 
-class ChatCantroller extends GetxController  {
-
+class ChatCantroller extends GetxController {
   final contactList = Rx<UiState<List<Contact>>>(UiState.none());
+  StreamSubscription<DatabaseEvent>? contactSubscription;
 
-    Future<void> getContactList() async {
-      contactList.value = UiState.loading();
-     final dataSnap = await FirebaseDatabase.instance.ref("contacts/${FirebaseAuth.instance.currentUser!.uid}").onValue.first;
-
-
-     contactList.value = UiState.success(
-     dataSnap.snapshot.children.map((e) =>Contact.fromJson(e)).toList(),
-     );
+  Future<void> getContactList() async {
+    contactList.value = UiState.loading();
+    contactSubscription =  FirebaseDatabase.instance
+        .ref("contacts/${FirebaseAuth.instance.currentUser!.uid}")
+        .onValue
+        .listen((event) {
+          contactList.value = UiState.success(
+            event.snapshot.children.map((e) => Contact.fromJson(e)).toList(),
+          );
+        });
   }
+
   @override
   void onReady() {
     getContactList();
     super.onReady();
+  }
+
+  @override
+  void onClose() {
+    contactSubscription?.cancel();
+    super.onClose();
   }
 }

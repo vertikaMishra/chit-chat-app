@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:whatsapp_project/modules/dashboard/chats/chat_cantroller.dart';
 import 'package:whatsapp_project/modules/login/login_screen.dart';
 import 'package:whatsapp_project/routes/app_screens.dart';
@@ -66,11 +67,9 @@ class ChatScreen extends GetView<ChatCantroller>{
                   break;
                 case 'Log out':
                   try {
+                    await GoogleSignIn().signOut();
                     await FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
+                    Get.offAllNamed(AppScreens.login);
                   } catch (e) {
                     debugPrint('Logout error:$e');
                   }

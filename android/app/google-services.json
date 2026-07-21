@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "619779037573",
+    "firebase_url": "https://chit-chat-ed913-default-rtdb.firebaseio.com",
+    "project_id": "chit-chat-ed913",
+    "storage_bucket": "chit-chat-ed913.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619779037573:android:5958e9567a1a0dbe3c4cec",
+        "android_client_info": {
+          "package_name": "com.example.ChitChat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "619779037573-irfic3kj42q4c9p03t4k6tvbpms2ij37.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKGRbL0amVNAyNp6uaTu_6e1UV23227gA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "619779037573-irfic3kj42q4c9p03t4k6tvbpms2ij37.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "619779037573-sgtsh5v3n521jgvnqjvd5kkoenvi9b1d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.whatsappProject"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
