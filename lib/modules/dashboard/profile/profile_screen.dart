@@ -3,72 +3,78 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whatsapp_project/modules/dashboard/dashboard_controller.dart';
 
-class ProfileScreen extends GetView<DashboardController>{
+class ProfileScreen extends GetView<DashboardController> {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:SingleChildScrollView(child:  Column(
-        children: [
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: 130),
-              child: Badge(
-                padding: EdgeInsets.all(5),
-                alignment: Alignment.bottomRight,
-                label: Icon(Icons.edit, color: Colors.white, size: 40),
-                offset: Offset(-45, -45),
-                backgroundColor: Colors.amber,
-                child: CircleAvatar(
-                  radius: 130,
-                  backgroundImage: NetworkImage(
-                    FirebaseAuth.instance.currentUser?.photoURL ?? "",
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(top: 130),
+                child: Badge(
+                  padding: EdgeInsets.all(5),
+                  alignment: Alignment.bottomRight,
+                  label: Icon(Icons.edit, color: Colors.white, size: 40),
+                  offset: Offset(-45, -45),
+                  backgroundColor: Colors.amber,
+                  child: CircleAvatar(
+                    radius: 130,
+                    backgroundImage: NetworkImage(
+                      controller.userData.value?.image ?? "",
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 25),
-          Text(
-            FirebaseAuth.instance.currentUser?.displayName ?? "",
-            style: TextStyle(fontSize: 35),
-          ),
-          Text(
-            FirebaseAuth.instance.currentUser?.email ?? "",
-            style: TextStyle(fontSize: 16),
-          ),
+            SizedBox(height: 25),
+            Obx(() {
+              return Text(
+                controller.userData.value?.name ?? "",
+                style: TextStyle(fontSize: 35),
+              );
+            }),
+            Obx(() {
+              return Text(
+                controller.userData.value?.email ?? "",
+                style: TextStyle(fontSize: 16),
+              );
+            }),
 
-          SizedBox(height: 25),
-          buildProfileTile(
-            title: "Edit profile",
-            subtitle: "Edit and update profile updates",
-            icon: Icons.navigate_next,
-            onTap: () => showUpdateProfileSheet(),
-          ),
-          buildProfileTile(
-            title: "Settings",
-            subtitle: "Change you want",
-            icon: Icons.settings,
-          ),
-          buildProfileTile(
-            title: "Invite",
-            subtitle: "Invite your favourites",
-            icon: Icons.insert_invitation_outlined,
-          ),
-          buildProfileTile(
-            title: "LogOut",
-            subtitle: "Anytime",
-            icon: Icons.login_outlined,
-          ),buildProfileTile(
-            title: "Username",
-            subtitle: "create privacy",
-            icon: Icons.drive_file_rename_outline_outlined,
-            onTap: () => showUsernameSheet(),
-          ),
-
-        ],
-      ),)
+            SizedBox(height: 25),
+            buildProfileTile(
+              title: "Edit profile",
+              subtitle: "Edit and update profile updates",
+              icon: Icons.navigate_next,
+              onTap: () => showUpdateProfileSheet(),
+            ),
+            buildProfileTile(
+              title: "Settings",
+              subtitle: "Change you want",
+              icon: Icons.settings,
+            ),
+            buildProfileTile(
+              title: "Invite",
+              subtitle: "Invite your favourites",
+              icon: Icons.insert_invitation_outlined,
+            ),
+            buildProfileTile(
+              title: "LogOut",
+              subtitle: "Anytime",
+              icon: Icons.login_outlined,
+            ),
+            buildProfileTile(
+              title: "Username",
+              subtitle: "create privacy",
+              icon: Icons.drive_file_rename_outline_outlined,
+              onTap: () => showUsernameSheet(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -96,10 +102,12 @@ class ProfileScreen extends GetView<DashboardController>{
   void showUpdateProfileSheet() {
     final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController(
-      text: FirebaseAuth.instance.currentUser?.displayName,
+      text: controller.userData.value?.name,
     );
 
-    final bioController = TextEditingController(text: "");
+    final bioController = TextEditingController(
+      text: controller.userData.value?.bio,
+    );
 
     Get.bottomSheet(
       SafeArea(
@@ -119,20 +127,21 @@ class ProfileScreen extends GetView<DashboardController>{
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Form(
-                    key:formKey,
+                    key: formKey,
                     child: Column(
                       children: [
                         SizedBox(height: 10),
                         TextFormField(
-                          controller:nameController,
+                          controller: nameController,
                           decoration: InputDecoration(
                             labelText: "Name",
                             hintText: "Enter name",
                             isDense: true,
                             border: OutlineInputBorder(),
                           ),
-                          validator:(value) => (value?.trim().length ?? 0) >=3?null
-                              :"please enter a valid name",
+                          validator: (value) => (value?.trim().length ?? 0) >= 3
+                              ? null
+                              : "please enter a valid name",
                         ),
                         SizedBox(height: 20),
                         TextFormField(
@@ -149,7 +158,7 @@ class ProfileScreen extends GetView<DashboardController>{
                         ),
                         SizedBox(height: 20),
                         TextFormField(
-                          controller:bioController,
+                          controller: bioController,
                           decoration: InputDecoration(
                             labelText: "Bio",
                             hintText: "Enter Bio...",
@@ -163,7 +172,7 @@ class ProfileScreen extends GetView<DashboardController>{
                         SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
-                            if (formKey.currentState!.validate()){
+                            if (formKey.currentState!.validate()) {
                               controller.updateProfile(
                                 name: nameController.text,
                                 bio: bioController.text,
@@ -183,9 +192,11 @@ class ProfileScreen extends GetView<DashboardController>{
       ),
     );
   }
-  void showUsernameSheet() {
 
-    final usernameController = TextEditingController();
+  void showUsernameSheet() {
+    final usernameController = TextEditingController(
+      text: controller.userData.value?.userName,
+    );
     Get.bottomSheet(
       SafeArea(
         child: Container(
@@ -207,23 +218,25 @@ class ProfileScreen extends GetView<DashboardController>{
                     children: [
                       SizedBox(height: 10),
                       TextFormField(
-                        controller:usernameController,
+                        controller: usernameController,
                         decoration: InputDecoration(
                           labelText: "UserName",
                           hintText: "Enter username",
                           isDense: true,
                           border: OutlineInputBorder(),
                         ),
-                        validator:(value) => (value?.trim().length ?? 0) >=5?null
-                            :"please enter a valid username",
+                        validator: (value) => (value?.trim().length ?? 0) >= 5
+                            ? null
+                            : "please enter a valid username",
                       ),
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          if (usernameController.text.trim().length>=5){
-                           controller.checkUpdateUserName(usernameController.text.trim());
-                          }
-                          else{
+                          if (usernameController.text.trim().length >= 5) {
+                            controller.checkUpdateUserName(
+                              usernameController.text.trim(),
+                            );
+                          } else {
                             Get.snackbar(
                               'Error',
                               "Enter valid username",

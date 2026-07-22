@@ -12,14 +12,17 @@ import 'package:whatsapp_project/routes/app_screens.dart';
 class LoginController extends GetxController {
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final isLoading = false.obs;
 
   Future<void> signInWithGoogle(BuildContext context) async {
+    isLoading.value = true;
     UserCredential? userCredential;
     userCredential = await signInWithGoogleForWeb();
     if (userCredential == null) {
       final GoogleSignInAccount? account = await _googleSignIn.signIn();
       if (account == null) {
         print("No Google Account found.");
+        isLoading.value=false;
         return;
       }
       final GoogleSignInAuthentication auth = await account.authentication;
@@ -53,12 +56,14 @@ class LoginController extends GetxController {
               "bio": "",
             });
       }
+      isLoading.value=false;
       if (context.mounted == true) {
         Get.offAllNamed(AppScreens.home);
       }
     } else {
       print("user not found");
     }
+    isLoading.value=false;
   }
 
   Future<UserCredential?> signInWithGoogleForWeb() async {

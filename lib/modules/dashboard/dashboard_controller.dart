@@ -6,14 +6,15 @@ import 'package:whatsapp_project/models/user_model.dart';
 
 /// Created by Vertika Mishra
 class DashboardController extends GetxController {
-  final Rx<UserModel?> userData=Rx(null);
+  final Rx<UserModel?> userData = Rx(null);
+
   Future<void> getUserData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid ?? "";
     final result = await FirebaseDatabase.instance
         .ref("users")
         .child(userId)
         .once();
-    userData.value=UserModel.fromSnapshot(result.snapshot);
+    userData.value = UserModel.fromSnapshot(result.snapshot);
   }
 
   @override
@@ -23,7 +24,13 @@ class DashboardController extends GetxController {
   }
 
   Future<void> checkUpdateUserName(String userName) async {
-    if(isValidUsername(userName)==false){
+    final isValid = isValidUsername(userName);
+    print("=====================>$isValid|$userName");
+    if (userName == userData.value?.userName) {
+      Get.back();
+      return;
+    }
+    if (!isValid) {
       Get.snackbar(
         'Error',
         "username is not valid",
@@ -52,18 +59,17 @@ class DashboardController extends GetxController {
     }
     final userId = FirebaseAuth.instance.currentUser?.uid ?? "";
     await FirebaseDatabase.instance.ref('users').child(userId).update({
-      'userName':userName,
+      'userName': userName,
     });
     getUserData();
     Get.back();
   }
 
   bool isValidUsername(String username) {
-    final regex = RegExp(
-      r'^(?=.{3,20}$)(?!._)[A-Za-z][A-Za-z0-9][A-Za-z0-9]$',
-    );
+    final regex = RegExp(r'^[A-Za-z][A-Za-z0-9s_]{2,19}$');
     return regex.hasMatch(username);
   }
+
   Future<void> updateProfile({required String name, String? bio}) async {
     final userId = FirebaseAuth.instance.currentUser?.uid ?? "";
     await FirebaseDatabase.instance.ref('users').child(userId).update({
@@ -73,5 +79,4 @@ class DashboardController extends GetxController {
     getUserData();
     Get.back();
   }
-
 }

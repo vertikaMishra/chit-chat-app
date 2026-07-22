@@ -17,6 +17,12 @@ class ChatScreen extends GetView<ChatCantroller>{
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      floatingActionButton: FloatingActionButton.small(
+        onPressed:(){
+          Get.toNamed(AppScreens.searchContact);
+        },
+        child: Icon(Icons.add),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Padding(
@@ -309,7 +315,7 @@ class ChatScreen extends GetView<ChatCantroller>{
                                     style: TextStyle(fontWeight: FontWeight.w700),
                                   ),
                                   SizedBox(height: 5),
-                                  Text(item.message),
+                                  Text(item.message??""),
                                 ],
                               ),
                             ),
@@ -317,7 +323,7 @@ class ChatScreen extends GetView<ChatCantroller>{
                             Padding(
                               padding: const EdgeInsets.only(bottom: 38),
                               child: Text(
-                                item.time,
+                                item.time??"",
                                 style: TextStyle(fontSize: 12),
                               ),
                             ),

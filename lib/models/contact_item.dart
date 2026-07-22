@@ -3,14 +3,18 @@ import 'package:firebase_database/firebase_database.dart';
 class Contact {
   String image;
   String name;
-  String message;
-  String time;
+  String uid;
+  String? message;
+  String? time;
+  num? count;
 
   Contact({
     required this.image,
     required this.name,
-    required this.message,
-    required this.time,
+    this.message,
+    this.time,
+    this.count,
+    required this.uid,
   });
 
   // Convert object to JSON
@@ -20,6 +24,8 @@ class Contact {
       "image": image,
       "message": message,
       "time": time,
+      "count": count,
+      "uid": uid,
     };
   }
 
@@ -33,6 +39,8 @@ class Contact {
       name: json["name"],
       message: json["message"],
       time: json["time"],
+      count: json['count'] as num?,
+      uid: json['uid']?.tostring()??'',
     );
   }
 }

@@ -7,7 +7,7 @@ import 'package:whatsapp_project/modules/login/login_Controller.dart';
 /// Created by Vertika Mishra
 
 class LoginScreen extends GetView<LoginController> {
-    const LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +15,7 @@ class LoginScreen extends GetView<LoginController> {
       backgroundColor: Color(0xFFBCD6BD),
       body: Column(
         children: [
-
-          Expanded(
-            child: Image.asset(
-               "images/ChitChatnewt.jpg.png"
-            ),
-          ),
+          Expanded(child: Image.asset("images/ChitChatnewt.jpg.png")),
           Text(
             "Let's get started",
             style: TextStyle(
@@ -37,13 +32,20 @@ class LoginScreen extends GetView<LoginController> {
             ),
           ),
           SizedBox(height: 56),
-          SizedBox(
-            height: 56,
-            width: 280,
-            child: SignInButton(Buttons.googleDark, onPressed: () {
-              controller.signInWithGoogle(context);
-            },),
-          ),
+          Obx(() {
+            return controller.isLoading.value
+                ? CircularProgressIndicator()
+                : SizedBox(
+              height: 56,
+              width: 280,
+              child: SignInButton(
+                Buttons.googleDark,
+                onPressed: () {
+                  controller.signInWithGoogle(context);
+                },
+              ),
+            );
+          }),
           SizedBox(height: 56),
         ],
       ),
