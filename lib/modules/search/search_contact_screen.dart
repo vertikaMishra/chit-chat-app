@@ -14,7 +14,7 @@ class SearchContactScreen extends GetView<SearchContactController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Search Users")),
+      appBar: AppBar(title: Text("Add users with search")),
       body: Column(
         children: [
           Padding(
@@ -48,9 +48,11 @@ class SearchContactScreen extends GetView<SearchContactController> {
                 SizedBox(width: 10),
                 IconButton.filled(
                   onPressed: () {
+                    print("onpressed");
                     if (controller.searchTextController.text
                         .trim()
                         .isNotEmpty) {
+                      print("search contact");
                       controller.searchContact(
                         controller.searchTextController.text.trim(),
                       );
@@ -72,10 +74,8 @@ class SearchContactScreen extends GetView<SearchContactController> {
                   itemBuilder: (context, index) {
                     final item = data[index];
                     return ListTile(
-                      onTap: () => Get.toNamed(
-                        AppScreens.chatDetails,
-                        arguments: Contact(name: item.name??"", uid: item.uid??"", image:item.image??"",),
-                      ),
+                      onTap: () =>
+                      controller.addToContact(item),
                       title: Text(item.name ?? ""),
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(item.image ?? ""),

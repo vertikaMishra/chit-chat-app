@@ -1,16 +1,16 @@
 import 'package:firebase_database/firebase_database.dart';
 
 class Contact {
-  String image;
-  String name;
+  String? image;
+  String? name;
   String uid;
   String? message;
   String? time;
   num? count;
 
   Contact({
-    required this.image,
-    required this.name,
+    this.image,
+    this.name,
     this.message,
     this.time,
     this.count,
@@ -31,16 +31,14 @@ class Contact {
 
   // Convert JSON to object
   factory Contact.fromJson(DataSnapshot snapshot) {
-    final json = Map<String,dynamic>.from(
-      snapshot.value as Map,
-    );
+    final json = Map<String, dynamic>.from(snapshot.value as Map);
     return Contact(
       image: json["image"],
       name: json["name"],
       message: json["message"],
       time: json["time"],
       count: json['count'] as num?,
-      uid: json['uid']?.tostring()??'',
+      uid: json['uid'] ?? '',
     );
   }
 }

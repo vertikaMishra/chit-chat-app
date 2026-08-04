@@ -1,4 +1,4 @@
-/// Created by Akash Verma
+
 import 'package:firebase_database/firebase_database.dart';
 
 enum MessageType {
@@ -15,7 +15,7 @@ enum MessageStatus {
 }
 
 class MessageItem {
-  final String conversationId;
+  final String? conversationId;
   final String msgId;
   final String senderId;
   final String text;
@@ -24,7 +24,7 @@ class MessageItem {
   final MessageStatus status;
 
   const MessageItem({
-    required this.conversationId,
+    this.conversationId,
     required this.msgId,
     required this.senderId,
     required this.text,
@@ -47,10 +47,10 @@ class MessageItem {
 
   factory MessageItem.fromJson(Map<dynamic, dynamic> json) {
     return MessageItem(
-      conversationId: json['conversationId']?.toString() ?? '',
-      msgId: json['msgId']?.toString() ?? '',
-      senderId: json['senderId']?.toString() ?? '',
-      text: json['text']?.toString() ?? '',
+      conversationId: json['conversationId']  ,
+      msgId: json['msgId'] ?? '',
+      senderId: json['senderId'] ?? '',
+      text: json['text'] ?? '',
       type: MessageType.values.firstWhere(
             (type) => type.name == json['type'],
         orElse: () => MessageType.text,
@@ -75,10 +75,10 @@ class MessageItem {
     final json = Map<dynamic, dynamic>.from(value);
 
     return MessageItem(
-      conversationId: json['conversationId']?.toString() ?? '',
-      msgId: json['msgId']?.toString() ?? snapshot.key ?? '',
-      senderId: json['senderId']?.toString() ?? '',
-      text: json['text']?.toString() ?? '',
+      conversationId: json['conversationId'] ,
+      msgId: json['msgId']  ?? snapshot.key ?? '',
+      senderId: json['senderId']  ?? '',
+      text: json['text'] ?? '',
       type: MessageType.values.firstWhere(
             (type) => type.name == json['type'],
         orElse: () => MessageType.text,

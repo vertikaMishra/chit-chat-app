@@ -5,4 +5,5 @@ class AppScreens {
  static final String login = "/login";
  static final String chatDetails = "/chat_details";
  static final String searchContact = "/search_contact";
+ static final String test = "/test";
 }

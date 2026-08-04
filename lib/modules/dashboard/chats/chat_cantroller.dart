@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
+
 import 'package:whatsapp_project/core/network/ui_state.dart';
 
 import '../../../models/contact_item.dart';
@@ -20,9 +22,15 @@ class ChatCantroller extends GetxController {
         .ref("contacts/${FirebaseAuth.instance.currentUser!.uid}")
         .onValue
         .listen((event) {
+          if(event.snapshot.children.isEmpty){
+            contactList.value=UiState.error("no data found");
+            return;
+          }
           contactList.value = UiState.success(
+
             event.snapshot.children.map((e) => Contact.fromJson(e)).toList(),
           );
+          print("=================> ${contactList.value.getDataOrNull()?.length}");
         });
   }
 
@@ -37,4 +45,7 @@ class ChatCantroller extends GetxController {
     contactSubscription?.cancel();
     super.onClose();
   }
+
+
+
 }

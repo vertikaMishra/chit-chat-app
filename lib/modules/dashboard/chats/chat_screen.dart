@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:whatsapp_project/core/ext.dart';
 import 'package:whatsapp_project/modules/dashboard/chats/chat_cantroller.dart';
 import 'package:whatsapp_project/modules/login/login_screen.dart';
 import 'package:whatsapp_project/routes/app_screens.dart';
@@ -22,6 +23,7 @@ class ChatScreen extends GetView<ChatCantroller>{
           Get.toNamed(AppScreens.searchContact);
         },
         child: Icon(Icons.add),
+        heroTag:"Button",
       ),
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -55,11 +57,14 @@ class ChatScreen extends GetView<ChatCantroller>{
             ),
           ),
           SizedBox(width: 30),
-          Icon(
-            Icons.camera_alt_outlined,
-            size: 30,
-            fontWeight: FontWeight.w400,
-            color: Colors.black,
+          InkWell(
+            //onTap: () => controller.openCamera(),
+            child: Icon(
+              Icons.camera_alt_outlined,
+              size: 30,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
           ),
           SizedBox(width: 30),
           PopupMenuButton<String>(
@@ -284,7 +289,7 @@ class ChatScreen extends GetView<ChatCantroller>{
                               width: 70,
                               height: 70,
                               child: CachedNetworkImage(
-                                imageUrl: item.image,
+                                imageUrl: item.image??"",
                                 imageBuilder: (context, imageProvider) =>
                                     Container(
                                       decoration: BoxDecoration(
@@ -311,19 +316,21 @@ class ChatScreen extends GetView<ChatCantroller>{
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    item.name,
+                                    item.name??"",
                                     style: TextStyle(fontWeight: FontWeight.w700),
                                   ),
-                                  SizedBox(height: 5),
-                                  Text(item.message??""),
+                                  if(item.message?.isNotEmpty==true)
+                                  ...[SizedBox(height: 5),
+                                  Text(item.message??"")],
                                 ],
                               ),
                             ),
                             Spacer(),
+                            if(item.time?.isNotEmpty==true)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 38),
                               child: Text(
-                                item.time??"",
+                                item.time.toWhatsAppDate(),
                                 style: TextStyle(fontSize: 12),
                               ),
                             ),

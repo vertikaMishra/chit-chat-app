@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:whatsapp_project/modules/dashboard/dashboard_controller.dart';
+
+import '../../../routes/app_screens.dart';
 
 class ProfileScreen extends GetView<DashboardController> {
   const ProfileScreen({super.key});
@@ -65,6 +68,15 @@ class ProfileScreen extends GetView<DashboardController> {
               title: "LogOut",
               subtitle: "Anytime",
               icon: Icons.login_outlined,
+              onTap: () async {
+                try {
+                  await GoogleSignIn().signOut();
+                  await FirebaseAuth.instance.signOut();
+                  Get.offAllNamed(AppScreens.login);
+                } catch (e) {
+                  debugPrint('Logout error:$e');
+                }
+              }
             ),
             buildProfileTile(
               title: "Username",

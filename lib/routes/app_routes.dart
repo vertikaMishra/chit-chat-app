@@ -60,5 +60,5 @@ final appRoutes = [
     page: () {
       return SearchContactScreen();
     },
-  ),
+  )
 ];
