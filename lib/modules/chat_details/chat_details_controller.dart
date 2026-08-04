@@ -83,32 +83,6 @@ class ChatDetailsController extends GetxController {
   }
 
   void getMessages() {
-    msgDbRef
-        .child(FirebaseAuth.instance.currentUser!.uid)
-        .child(contact.uid)
-        .once()
-        .then((event) {
-          final messages = event.snapshot.children
-              .map((e) => MessageItem.fromSnapshot(e))
-              .toList();
-          messageList.value = UiState.success(messages);
-          conDbRef
-              .child(FirebaseAuth.instance.currentUser!.uid)
-              .child(contact.uid)
-              .update({"count": 0});
-          messages.retainWhere(
-            (element) =>
-                element.status != MessageStatus.read &&
-                element.senderId != FirebaseAuth.instance.currentUser!.uid,
-          );
-          for (final item in messages) {
-            msgDbRef
-                .child(contact.uid)
-                .child(FirebaseAuth.instance.currentUser!.uid)
-                .child(item.msgId)
-                .update({"status": MessageStatus.read.name});
-          }
-        });
     newMessageSubscription = msgDbRef
         .child(FirebaseAuth.instance.currentUser!.uid)
         .child(contact.uid)
