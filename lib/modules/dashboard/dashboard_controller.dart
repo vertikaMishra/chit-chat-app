@@ -79,4 +79,18 @@ class DashboardController extends GetxController {
     getUserData();
     Get.back();
   }
+
+  Future<void> updateUserStatus(bool isOnline) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null) return;
+
+    await FirebaseDatabase.instance.ref("users").child(uid).update({
+      "online": isOnline,
+      "lastSeen": ServerValue.timestamp,
+    });
+  }
+
 }
+
+

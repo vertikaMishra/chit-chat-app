@@ -9,6 +9,8 @@ class UserModel {
   String? uid;
   String? userName;
   String? bio;
+  bool? online;
+  int? lastSeen;
 
   UserModel({
     this.name,
@@ -17,6 +19,8 @@ class UserModel {
     this.uid,
     this.userName,
     this.bio,
+    this.online,
+    this.lastSeen,
   });
 
   Map<String, dynamic> toMap() {
@@ -27,6 +31,8 @@ class UserModel {
       "uid": uid,
       "userName": userName,
       "bio": bio,
+      "online": online,
+      "lastSeen": lastSeen,
     };
   }
 
@@ -40,6 +46,8 @@ class UserModel {
       uid: data?["uid"]?.toString(),
       userName: data?["userName"]?.toString(),
       bio: data?["bio"]?.toString(),
+      online: data?["online"] ?? false,
+      lastSeen: data?["lastSeen"],
     );
   }
 
@@ -51,6 +59,8 @@ class UserModel {
       uid: map["uid"]?.toString(),
       userName: map["userName"]?.toString(),
       bio: map["bio"]?.toString(),
+      online: map["online"] ?? false,
+      lastSeen: map["lastSeen"],
     );
   }
 }

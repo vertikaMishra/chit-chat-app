@@ -7,6 +7,8 @@ import 'package:whatsapp_project/modules/dashboard/dashboard_screen.dart';
 import 'package:whatsapp_project/modules/login/login_screen.dart';
 import 'package:whatsapp_project/routes/app_routes.dart';
 import 'package:whatsapp_project/routes/app_screens.dart';
+import 'package:get/get.dart';
+import 'package:whatsapp_project/modules/dashboard/dashboard_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,8 +16,42 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp ({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  late DashboardController dashboardController;
+  @override
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
+    dashboardController = Get.put(DashboardController());
+
+    dashboardController.updateUserStatus(true);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      dashboardController.updateUserStatus(true);
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      dashboardController.updateUserStatus(false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +65,9 @@ class MyApp extends StatelessWidget {
         ),
       ),
       getPages: appRoutes,
-      initialRoute: FirebaseAuth.instance.currentUser==null?AppScreens.login:AppScreens.home,
+      initialRoute: FirebaseAuth.instance.currentUser == null
+          ? AppScreens.login
+          : AppScreens.home,
     );
   }
 }
