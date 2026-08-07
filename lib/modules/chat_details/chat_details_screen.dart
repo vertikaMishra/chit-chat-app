@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:whatsapp_project/models/message_item.dart';
 import 'package:whatsapp_project/modules/chat_details/chat_details_controller.dart';
+import 'package:whatsapp_project/widgets/emoji_full_screen_animation.dart';
 
 import '../../core/ext.dart';
 
@@ -21,68 +22,111 @@ class ChatDetailsScreen extends GetView<ChatDetailsController> {
         backgroundColor: Color(0xFF1D385C),
         foregroundColor: Colors.white,
         title: Text(controller.contact.name ?? ""),
-        actions: [IconButton(onPressed: () {
-          controller.clearchat();
-        }, icon: Icon(Icons.delete_outline_outlined))],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Obx(() {
-              return controller.messageList.value.when(
-                none: () => SizedBox.shrink(),
-                loading: () => Center(child: CircularProgressIndicator()),
-                error: (msg) => Text(msg),
-                success: (data) => ListView.builder(
-                  itemCount: data.length,
-                  reverse: true,
-                  itemBuilder: (context, index) {
-                    final item = data[index];
-                    return MessageBubble(item: item);
-                  },
-                ),
-              );
-            }),
+        actions: [
+          IconButton(
+            onPressed: () {
+              controller.clearchat();
+            },
+            icon: const Icon(Icons.delete_outline_outlined),
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller.messageController,
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: "message here",
-                        filled: true,
-                        isDense: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
+        ],
+      ),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: Obx(() {
+                  return controller.messageList.value.when(
+                    none: () => SizedBox.shrink(),
+                    loading: () => Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    error: (msg) => Text(msg),
+                    success: (data) => ListView.builder(
+                      itemCount: data.length,
+                      reverse: true,
+                      itemBuilder: (context, index) {
+                        final item = data[index];
+                        return MessageBubble(item: item);
+                      },
+                    ),
+                  );
+                }),
+              ),
+
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: controller.messageController,
+                          minLines: 1,
+                          maxLines: 4,
+                          decoration: InputDecoration(
+                            hintText: "message here",
+                            filled: true,
+                            isDense: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+
+                      const SizedBox(width: 8),
+
+                      IconButton.filledTonal(
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        color: Colors.white,
+                        onPressed: () {
+                          final text =
+                          controller.messageController.text.trim();
+
+                          if (text.isNotEmpty) {
+                            controller.sendMessage(text);
+
+                            // Emoji animation
+                            if (text.isEmojiOnly()) {
+                              controller.showEmojiAnimation(text);
+                            }
+                          }
+
+                          controller.messageController.clear();
+                        },
+                        icon: const Icon(
+                          Icons.send_rounded,
+                          size: 18,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 8),
-                  IconButton.filledTonal(
-                    style: IconButton.styleFrom(backgroundColor: Colors.green),
-                    color: Colors.white,
-                    onPressed: () {
-                      if (controller.messageController.text.isNotEmpty) {
-                        controller.sendMessage(
-                          controller.messageController.text.trim(),
-                        );
-                      }
-                      controller.messageController.clear();
-                    },
-                    icon: Icon(Icons.send_rounded, size: 18),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
+
+          // Full-screen emoji animation
+          Obx(() {
+            final emoji = controller.animatedEmoji.value;
+
+            if (emoji == null) {
+              return const SizedBox.shrink();
+            }
+
+            return EmojiFullScreenAnimation(
+              emoji: emoji,
+              onFinished: controller.hideEmojiAnimation,
+            );
+          }),
         ],
       ),
     );
@@ -90,96 +134,106 @@ class ChatDetailsScreen extends GetView<ChatDetailsController> {
 }
 
 class MessageBubble extends StatelessWidget {
-  const MessageBubble({super.key, required this.item});
+  const MessageBubble({
+    super.key,
+    required this.item,
+  });
 
   final MessageItem item;
 
   @override
   Widget build(BuildContext context) {
+    final isMe =
+        item.senderId == FirebaseAuth.instance.currentUser?.uid;
+
+    final isEmoji = item.text.isEmojiOnly();
+
     return Row(
-      mainAxisAlignment: item.senderId == FirebaseAuth.instance.currentUser?.uid
-          ? MainAxisAlignment.end
-          : MainAxisAlignment.start,
+      mainAxisAlignment:
+      isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         Container(
           margin: EdgeInsets.only(
-            left: item.senderId == FirebaseAuth.instance.currentUser?.uid
-                ? 0
-                : 16,
-            right: item.senderId == FirebaseAuth.instance.currentUser?.uid
-                ? 16
-                : 0,
+            left: isMe ? 0 : 16,
+            right: isMe ? 16 : 0,
             top: 4,
           ),
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          padding: isEmoji
+              ? const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 4,
+          )
+              : const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 8,
+          ),
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 0.7,
           ),
-          decoration: BoxDecoration(
-            color: item.text.isEmojiOnly()
-                ? Colors.transparent
-                : item.senderId != FirebaseAuth.instance.currentUser?.uid
-                ? Color(0xFF9D5A6C)
-                : Color(0xFF330057),
+          decoration: isEmoji
+              ? null
+              : BoxDecoration(
+            color: isMe
+                ? const Color(0xFF330057)
+                : const Color(0xFF9D5A6C),
             borderRadius: BorderRadius.only(
-              bottomLeft:
-                  item.senderId != FirebaseAuth.instance.currentUser?.uid
+              bottomLeft: isMe
+                  ? const Radius.circular(16)
+                  : Radius.zero,
+              bottomRight: isMe
                   ? Radius.zero
-                  : Radius.circular(16),
-              bottomRight:
-                  item.senderId == FirebaseAuth.instance.currentUser?.uid
-                  ? Radius.zero
-                  : Radius.circular(16),
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
+                  : const Radius.circular(16),
+              topLeft: const Radius.circular(16),
+              topRight: const Radius.circular(16),
             ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment:
-                item.senderId == FirebaseAuth.instance.currentUser?.uid
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Text(
                 item.text,
                 style: TextStyle(
-                  fontSize: item.text.isEmojiOnly() ? 45 : 18,
+                  fontSize: isEmoji ? 55 : 18,
                   color: Colors.white,
                 ),
               ),
-              SizedBox(height: 2),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    item.timestamp.toString().toDateStr(pattern: "hh:mm a"),
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: item.text.isEmojiOnly()
-                          ? Colors.black
-                          : Colors.white,
+
+              if (!isEmoji) ...[
+                const SizedBox(height: 2),
+
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      item.timestamp
+                          .toString()
+                          .toDateStr(pattern: "hh:mm a"),
+                      style: const TextStyle(
+                        fontSize: 9,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  if (item.senderId ==
-                      FirebaseAuth.instance.currentUser?.uid) ...[
-                    SizedBox(width: 4),
-                    Icon(
-                      (item.status == MessageStatus.sending)
-                          ? Icons.history_toggle_off
-                          : (item.status == MessageStatus.sent)
-                          ? Icons.check
-                          : (item.status == MessageStatus.delivered)
-                          ? Icons.check_circle_outline
-                          : Icons.check_circle,
-                      size: 12,
-                      color: item.text.isEmojiOnly()
-                          ? Colors.black
-                          : Colors.white,
-                    ),
+
+                    if (isMe) ...[
+                      const SizedBox(width: 4),
+
+                      Icon(
+                        item.status == MessageStatus.sending
+                            ? Icons.history_toggle_off
+                            : item.status == MessageStatus.sent
+                            ? Icons.check
+                            : item.status == MessageStatus.delivered
+                            ? Icons.check_circle_outline
+                            : Icons.check_circle,
+                        size: 12,
+                        color: Colors.white,
+                      ),
+                    ],
                   ],
-                ],
-              ),
+                ),
+              ],
             ],
           ),
         ),

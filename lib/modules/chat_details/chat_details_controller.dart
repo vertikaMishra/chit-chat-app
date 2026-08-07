@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,6 +13,7 @@ import '../../models/contact_item.dart';
 
 class ChatDetailsController extends GetxController {
   final Contact contact = Get.arguments;
+  final RxnString animatedEmoji = RxnString();
   final messageList = Rx<UiState<List<MessageItem>>>(UiState.none());
   StreamSubscription<DatabaseEvent>? newMessageSubscription;
   StreamSubscription<DatabaseEvent>? updateMessageSubscription;
@@ -21,6 +21,14 @@ class ChatDetailsController extends GetxController {
   final conDbRef = FirebaseDatabase.instance.ref("contacts");
 
   final messageController = TextEditingController();
+
+  void showEmojiAnimation(String emoji) {
+    animatedEmoji.value = emoji;
+  }
+
+  void hideEmojiAnimation() {
+    animatedEmoji.value = null;
+  }
 
   @override
   void onReady() {
