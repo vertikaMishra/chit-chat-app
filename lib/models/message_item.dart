@@ -22,6 +22,9 @@ class MessageItem {
   final MessageType type;
   final num timestamp;
   final MessageStatus status;
+  final String? replyToMessageId;
+  final String? replyToText;
+  final String? reaction;
 
   const MessageItem({
     this.conversationId,
@@ -31,6 +34,9 @@ class MessageItem {
     required this.type,
     required this.timestamp,
     required this.status,
+    this.replyToMessageId,
+    this.replyToText,
+    this.reaction,
   });
 
   Map<String, dynamic> toJson() {
@@ -42,11 +48,16 @@ class MessageItem {
       'type': type.name,
       'timestamp': timestamp,
       'status': status.name,
+      'replyToMessageId': replyToMessageId,
+      'replyToText': replyToText,
+      'reaction': reaction,
     };
   }
 
   factory MessageItem.fromJson(Map<dynamic, dynamic> json) {
     return MessageItem(
+      replyToMessageId: json['replyToMessageId']?.toString(),
+      replyToText: json['replyToText']?.toString(),
       conversationId: json['conversationId']  ,
       msgId: json['msgId'] ?? '',
       senderId: json['senderId'] ?? '',
@@ -62,6 +73,7 @@ class MessageItem {
             (status) => status.name == json['status'],
         orElse: () => MessageStatus.sent,
       ),
+      reaction: json['reaction'],
     );
   }
 
@@ -75,6 +87,8 @@ class MessageItem {
     final json = Map<dynamic, dynamic>.from(value);
 
     return MessageItem(
+      replyToMessageId: json['replyToMessageId']?.toString(),
+      replyToText: json['replyToText']?.toString(),
       conversationId: json['conversationId'] ,
       msgId: json['msgId']  ?? snapshot.key ?? '',
       senderId: json['senderId']  ?? '',
@@ -90,6 +104,7 @@ class MessageItem {
             (status) => status.name == json['status'],
         orElse: () => MessageStatus.sent,
       ),
+      reaction: json['reaction'],
     );
   }
 }

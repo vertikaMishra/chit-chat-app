@@ -22,6 +22,22 @@ class ChatDetailsController extends GetxController {
 
   final messageController = TextEditingController();
 
+  final Rxn<MessageItem> replyMessage = Rxn<MessageItem>();
+
+  void startReply(MessageItem message) {
+    replyMessage.value = message;
+
+    Get.snackbar(
+      "Reply",
+      "Replying to: ${message.text}",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  void cancelReply() {
+    replyMessage.value = null;
+  }
+
   void showEmojiAnimation(String emoji) {
     animatedEmoji.value = emoji;
   }
@@ -36,8 +52,9 @@ class ChatDetailsController extends GetxController {
     super.onReady();
   }
 
-  Future<void> sendMessage(String text) async {
+  Future sendMessage(String text) async {
     final key = msgDbRef.push().key ?? DateTime.now().toString();
+
     final newMassage = MessageItem(
       senderId: FirebaseAuth.instance.currentUser!.uid,
       text: text,
@@ -45,42 +62,52 @@ class ChatDetailsController extends GetxController {
       type: MessageType.text,
       status: MessageStatus.sending,
       msgId: key,
+
+      // Reply information
+      replyToMessageId: replyMessage.value?.msgId,
+      replyToText: replyMessage.value?.text,
     );
 
     final list = <MessageItem>[];
     list.add(newMassage);
+
     if (messageList.value.getDataOrNull() != null) {
       list.addAll(messageList.value.getDataOrNull()!);
     }
+
     messageList.value = UiState.success(list);
 
     final req3 = conDbRef
         .child(FirebaseAuth.instance.currentUser!.uid)
         .child(contact.uid ?? "")
         .update({
-          "message": text,
-          "time": DateTime.now().microsecondsSinceEpoch.toString(),
-          "count": 0,
-        });
+      "message": text,
+      "time": DateTime.now().microsecondsSinceEpoch.toString(),
+      "count": 0,
+    });
+
     final req4 = conDbRef
         .child(contact.uid)
         .child(FirebaseAuth.instance.currentUser!.uid)
         .update({
-          "name": FirebaseAuth.instance.currentUser!.displayName,
-          "uid": FirebaseAuth.instance.currentUser!.uid,
-          "image": FirebaseAuth.instance.currentUser!.photoURL,
-          "message": text,
-          "time": DateTime.now().microsecondsSinceEpoch.toString(),
-          "count": ServerValue.increment(1),
-        });
+      "name": FirebaseAuth.instance.currentUser!.displayName,
+      "uid": FirebaseAuth.instance.currentUser!.uid,
+      "image": FirebaseAuth.instance.currentUser!.photoURL,
+      "message": text,
+      "time": DateTime.now().microsecondsSinceEpoch.toString(),
+      "count": ServerValue.increment(1),
+    });
 
     final map = newMassage.toJson();
+
     map['status'] = MessageStatus.sent.name;
+
     final req1 = msgDbRef
         .child(FirebaseAuth.instance.currentUser!.uid)
         .child(contact.uid)
         .child(key)
         .set(map);
+
     final req2 = msgDbRef
         .child(contact.uid)
         .child(FirebaseAuth.instance.currentUser!.uid)
@@ -88,6 +115,8 @@ class ChatDetailsController extends GetxController {
         .set(map);
 
     await Future.wait([req1, req2, req3, req4]);
+
+    replyMessage.value = null;
   }
 
   void getMessages() {
@@ -147,11 +176,12 @@ class ChatDetailsController extends GetxController {
   }
 
   Future<void> clearchat() async {
-    final confirmed = await Get.dialog<bool>(
+    final confirmed = await Get.dialog(
       AlertDialog(
         title: const Text("Clear chat"),
         content: const Text(
-          "Are you sure you want to clear all messages in this chat? This action cannot be undone.",
+          "Are you sure you want to clear all messages in this chat? "
+          "This action cannot be undone.",
         ),
         actions: [
           TextButton(
@@ -167,15 +197,36 @@ class ChatDetailsController extends GetxController {
     );
 
     if (confirmed == true) {
-      msgDbRef
+      await msgDbRef
           .child(FirebaseAuth.instance.currentUser!.uid)
           .child(contact.uid)
           .remove();
-      conDbRef
+
+      await conDbRef
           .child(FirebaseAuth.instance.currentUser!.uid)
           .child(contact.uid)
           .update({"message": null, "time": null, "count": 0});
+
       messageList.value = UiState.success([]);
     }
+  }
+
+  /// Add or change reaction to a message
+  Future<void> addReaction(MessageItem message, String reaction) async {
+    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+    // Update my copy
+    await msgDbRef
+        .child(currentUserId)
+        .child(contact.uid)
+        .child(message.msgId)
+        .update({"reaction": reaction});
+
+    // Update receiver's copy
+    await msgDbRef
+        .child(contact.uid)
+        .child(currentUserId)
+        .child(message.msgId)
+        .update({"reaction": reaction});
   }
 }
