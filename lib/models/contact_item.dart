@@ -7,6 +7,8 @@ class Contact {
   String? message;
   String? time;
   num? count;
+  int streak;
+  String? lastMessageDate;
 
   Contact({
     this.image,
@@ -15,6 +17,8 @@ class Contact {
     this.time,
     this.count,
     required this.uid,
+    this.streak = 0,
+    this.lastMessageDate,
   });
 
   // Convert object to JSON

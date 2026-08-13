@@ -11,6 +11,9 @@ import 'package:whatsapp_project/modules/login/login_screen.dart';
 import 'package:whatsapp_project/modules/search/search_contact_controller.dart';
 import 'package:whatsapp_project/modules/search/search_contact_screen.dart';
 import 'package:whatsapp_project/routes/app_screens.dart';
+import 'package:whatsapp_project/modules/streaks/streaks_controller.dart';
+import 'package:whatsapp_project/modules/streaks/streaks_screen.dart';
+
 
 /// Created by Vertika Mishra
 
@@ -21,8 +24,13 @@ final appRoutes = [
       Get.lazyPut(() {
         return ChatCantroller();
       });
+
       Get.lazyPut(() {
         return DashboardController();
+      });
+
+      Get.lazyPut(() {
+        return StreaksController();
       });
     }),
     page: () {
@@ -60,5 +68,14 @@ final appRoutes = [
     page: () {
       return SearchContactScreen();
     },
-  )
+  ),
+  GetPage(
+    name: '/streaks',
+    binding: BindingsBuilder(() {
+      Get.lazyPut(() => StreaksController());
+    }),
+    page: () {
+      return StreaksScreen();
+    },
+  ),
 ];

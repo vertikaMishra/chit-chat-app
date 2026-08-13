@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:whatsapp_project/modules/dashboard/communities/communities_screen.dart';
+import 'package:whatsapp_project/modules/streaks/streaks_screen.dart';
 import 'package:whatsapp_project/modules/dashboard/profile/profile_screen.dart';
 import 'package:whatsapp_project/modules/dashboard/updates/updates_screen.dart';
 
@@ -22,7 +22,7 @@ class DashboardScreen extends StatelessWidget {
           children: [
             ChatScreen(),
             UpdatesScreen(),
-            CommunitiesScreen(),
+            StreaksScreen(),
             ProfileScreen(),
           ],
         );
@@ -50,9 +50,12 @@ class DashboardScreen extends StatelessWidget {
               activeIcon: Icon(Icons.donut_large, color: Colors.green),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.groups_outlined, size: 30),
-              label: "Communities",
-              activeIcon: Icon(Icons.groups, color: Colors.green),
+              icon: Icon(Icons.local_fire_department_outlined, size: 30),
+              label: "Streaks",
+              activeIcon: Icon(
+                Icons.local_fire_department,
+                color: Colors.deepOrange,
+              ),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outlined, size: 30),

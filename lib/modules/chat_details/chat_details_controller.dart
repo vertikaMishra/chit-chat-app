@@ -52,6 +52,74 @@ class ChatDetailsController extends GetxController {
     super.onReady();
   }
 
+  Future<void> updateStreak() async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (currentUserId == null) return;
+    if (contact.uid.isEmpty) return;
+
+    final today = DateTime.now();
+
+    final todayDate =
+        "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+
+    final contactRef = conDbRef
+        .child(currentUserId)
+        .child(contact.uid);
+
+    final snapshot = await contactRef.get();
+
+    int currentStreak = 0;
+    String? lastMessageDate;
+
+    if (snapshot.exists && snapshot.value is Map) {
+      final data = Map<dynamic, dynamic>.from(snapshot.value as Map);
+
+      currentStreak =
+          int.tryParse(data["streak"]?.toString() ?? "0") ?? 0;
+
+      lastMessageDate = data["lastMessageDate"]?.toString();
+    }
+
+    if (lastMessageDate == todayDate) {
+      return;
+    }
+
+    int newStreak;
+
+    if (lastMessageDate == null || lastMessageDate!.isEmpty) {
+      newStreak = 1;
+    } else {
+      final previousDate = DateTime.tryParse(lastMessageDate!);
+
+      if (previousDate == null) {
+        newStreak = 1;
+      } else {
+        final difference =
+            DateTime(today.year, today.month, today.day)
+                .difference(
+              DateTime(
+                previousDate.year,
+                previousDate.month,
+                previousDate.day,
+              ),
+            )
+                .inDays;
+
+        if (difference == 1) {
+          newStreak = currentStreak + 1;
+        } else {
+          newStreak = 1;
+        }
+      }
+    }
+
+    await contactRef.update({
+      "streak": newStreak,
+      "lastMessageDate": todayDate,
+    });
+  }
+
   Future sendMessage(String text) async {
     final key = msgDbRef.push().key ?? DateTime.now().toString();
 
@@ -115,6 +183,8 @@ class ChatDetailsController extends GetxController {
         .set(map);
 
     await Future.wait([req1, req2, req3, req4]);
+
+    await updateStreak();
 
     replyMessage.value = null;
   }
