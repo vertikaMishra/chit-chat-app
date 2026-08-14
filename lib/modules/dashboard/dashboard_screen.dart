@@ -47,7 +47,7 @@ class DashboardScreen extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Icon(Icons.donut_large_outlined, size: 30),
               label: "Updates",
-              activeIcon: Icon(Icons.donut_large, color: Colors.green),
+              activeIcon: Icon(Icons.donut_large, color: Colors.deepPurpleAccent),
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.local_fire_department_outlined, size: 30),
@@ -60,7 +60,7 @@ class DashboardScreen extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outlined, size: 30),
               label: "Profile",
-              activeIcon: Icon(Icons.person, color: Colors.green),
+              activeIcon: Icon(Icons.person, color: Colors.pink),
             ),
           ],
         );

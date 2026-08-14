@@ -10,8 +10,10 @@ import 'package:whatsapp_project/routes/app_screens.dart';
 
 import '../dashboard_screen.dart';
 import '../../../models/contact_item.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class ChatScreen extends GetView<ChatCantroller>{
+class ChatScreen extends GetView<ChatCantroller> {
   const ChatScreen({super.key});
 
   @override
@@ -19,54 +21,39 @@ class ChatScreen extends GetView<ChatCantroller>{
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton.small(
-        onPressed:(){
+        onPressed: () {
           Get.toNamed(AppScreens.searchContact);
         },
         child: Icon(Icons.add),
-        heroTag:"Button",
+        heroTag: "Button",
       ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Padding(
           padding: const EdgeInsets.only(left: 2),
-          child: Text(
-            "ChitChat",
-            style: TextStyle(
-              color: Colors.green,
-              fontWeight: FontWeight.w800,
-              fontSize: 25,
+          child: ShaderMask(
+            shaderCallback: (bounds) {
+              return const LinearGradient(
+                colors: [
+                  Color(0xFF00796B),
+                  Color(0xFF00ACC1),
+                  Color(0xFF4527A0),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ).createShader(bounds);
+            },
+            child: Text(
+              "ChitChat",
+              style: GoogleFonts.greatVibes(
+                color: Colors.white,
+                fontSize: 45,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
         ),
         actions: [
-          CircleAvatar(
-            radius: 13,
-            backgroundColor: Colors.transparent,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 2),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.currency_rupee,
-                  size: 18,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 30),
-          InkWell(
-            //onTap: () => controller.openCamera(),
-            child: Icon(
-              Icons.camera_alt_outlined,
-              size: 30,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(width: 30),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, size: 30, color: Colors.black),
             position: PopupMenuPosition.under,
@@ -74,15 +61,17 @@ class ChatScreen extends GetView<ChatCantroller>{
               switch (value) {
                 case 'Profile':
                   break;
+
                 case 'Settings':
                   break;
+
                 case 'Log out':
                   try {
                     await GoogleSignIn().signOut();
                     await FirebaseAuth.instance.signOut();
                     Get.offAllNamed(AppScreens.login);
                   } catch (e) {
-                    debugPrint('Logout error:$e');
+                    debugPrint('Logout error: $e');
                   }
                   break;
               }
@@ -93,30 +82,33 @@ class ChatScreen extends GetView<ChatCantroller>{
                   value: 'Profile',
                   child: Row(
                     children: [
-                      Icon(Icons.person_outline),
-                      SizedBox(width: 12),
-                      Text('Profile'),
+                      const Icon(Icons.person_outline),
+                      const SizedBox(width: 12),
+                      const Text('Profile'),
                     ],
                   ),
                 ),
+
                 PopupMenuItem<String>(
                   value: 'Settings',
                   child: Row(
                     children: [
-                      Icon(Icons.person_outline),
-                      SizedBox(width: 12),
-                      Text('Settings'),
+                      const Icon(Icons.settings_outlined),
+                      const SizedBox(width: 12),
+                      const Text('Settings'),
                     ],
                   ),
                 ),
-                PopupMenuDivider(),
+
+                const PopupMenuDivider(),
+
                 PopupMenuItem<String>(
                   value: 'Log out',
                   child: Row(
                     children: [
-                      Icon(Icons.person_outline),
-                      SizedBox(width: 12),
-                      Text('Log out'),
+                      const Icon(Icons.logout),
+                      const SizedBox(width: 12),
+                      const Text('Log out'),
                     ],
                   ),
                 ),
@@ -138,128 +130,32 @@ class ChatScreen extends GetView<ChatCantroller>{
                     ),
                     color: Colors.white70,
                     elevation: 0.1,
-                    child: TextField(
+                    child:TextField(
+                      controller: controller.searchController,
+                      onChanged: controller.searchContacts,
                       onTapOutside: (event) =>
                           FocusManager.instance.primaryFocus?.unfocus(),
                       decoration: InputDecoration(
-                        labelText: "Ask Meta AI or Search",
+                        labelText: "Search chats",
                         isDense: true,
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Icon(Icons.search, size: 25),
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 20),
+                          child: Icon(
+                            Icons.search,
+                            size: 25,
+                          ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: controller.clearSearch,
                         ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(0),
+                        contentPadding: EdgeInsets.zero,
                       ),
                     ),
                   ),
                 ),
               ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 12, 0, 2),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  SizedBox(width: 25),
-                  ChoiceChip.elevated(
-                    label: Text(
-                      "All",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    selected: true,
-                    showCheckmark: false,
-                    selectedColor: Colors.white70,
-                    checkmarkColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(100),
-                      side: BorderSide(width: 1.5, color: Colors.black12),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ChoiceChip.elevated(
-                    label: Text(
-                      "Unread",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    selected: true,
-                    showCheckmark: false,
-                    selectedColor: Colors.white70,
-                    checkmarkColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(100),
-                      side: BorderSide(width: 1.5, color: Colors.black12),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ChoiceChip.elevated(
-                    label: Text(
-                      "Favourites",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    selected: true,
-                    showCheckmark: false,
-                    selectedColor: Colors.white70,
-                    checkmarkColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(100),
-                      side: BorderSide(width: 1.5, color: Colors.black12),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ChoiceChip.elevated(
-                    label: Text(
-                      "Groups",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    selected: true,
-                    showCheckmark: false,
-                    selectedColor: Colors.white70,
-                    checkmarkColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(100),
-                      side: BorderSide(width: 1.5, color: Colors.black12),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  ChoiceChip.elevated(
-                    label: Text(
-                      "+",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    selected: true,
-                    showCheckmark: false,
-                    selectedColor: Colors.white70,
-                    checkmarkColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(100),
-                      side: BorderSide(width: 1.5, color: Colors.black12),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
           Expanded(
@@ -272,76 +168,92 @@ class ChatScreen extends GetView<ChatCantroller>{
                   ),
                 ),
                 error: (msg) => Text(msg),
-                success: (data) => ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    Contact item = data[index];
+                success: (data) {
+                  return Obx(() {
+                    final contacts = controller.filteredContacts;
+                    return ListView.builder(
+                      itemCount: contacts.length,
+                      itemBuilder: (context, index) {
+                        Contact item = contacts[index];
 
-                    return InkWell(
-                      onTap: () {
-                        Get.toNamed(AppScreens.chatDetails,arguments:item);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 70,
-                              height: 70,
-                              child: CachedNetworkImage(
-                                imageUrl: item.image??"",
-                                imageBuilder: (context, imageProvider) =>
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.green,
-                                          width: 4,
+                        return InkWell(
+                          onTap: () {
+                            Get.toNamed(
+                                AppScreens.chatDetails, arguments: item);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  child: CachedNetworkImage(
+                                    imageUrl: item.image ?? "",
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Color(0xFF4527A0),
+                                              width: 4,
+                                            ),
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                         ),
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
+                                    children: [
+                                      Text(
+                                        item.name ?? "",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
                                         ),
                                       ),
-                                    ),
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.name??"",
-                                    style: TextStyle(fontWeight: FontWeight.w700),
+                                      if (item.message?.isNotEmpty == true) ...[
+                                        SizedBox(height: 5),
+                                        Text(item.message ?? ""),
+                                      ],
+                                    ],
                                   ),
-                                  if(item.message?.isNotEmpty==true)
-                                  ...[SizedBox(height: 5),
-                                  Text(item.message??"")],
-                                ],
-                              ),
+                                ),
+                                Spacer(),
+                                if (item.time?.isNotEmpty == true)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 38),
+                                    child: Text(
+                                      item.time.toWhatsAppDate(),
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                              ],
                             ),
-                            Spacer(),
-                            if(item.time?.isNotEmpty==true)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 38),
-                              child: Text(
-                                item.time.toWhatsAppDate(),
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     );
                   },
-                ),
+                  );
+                }
               );
             }),
+
           ),
         ],
       ),
