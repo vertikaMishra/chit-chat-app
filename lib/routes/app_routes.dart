@@ -13,6 +13,9 @@ import 'package:whatsapp_project/modules/search/search_contact_screen.dart';
 import 'package:whatsapp_project/routes/app_screens.dart';
 import 'package:whatsapp_project/modules/streaks/streaks_controller.dart';
 import 'package:whatsapp_project/modules/streaks/streaks_screen.dart';
+import 'package:whatsapp_project/modules/guess_me/guess_me_screen.dart';
+
+import '../modules/guess_me/guess_me_controller.dart';
 
 
 /// Created by Vertika Mishra
@@ -67,6 +70,17 @@ final appRoutes = [
     }),
     page: () {
       return SearchContactScreen();
+    },
+  ),
+  GetPage(
+    name: AppScreens.guessMe,
+    binding: BindingsBuilder(() {
+      Get.lazyPut(() {
+        return GuessMeController();
+      });
+    }),
+    page: () {
+      return const GuessMeScreen();
     },
   ),
   GetPage(
