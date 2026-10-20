@@ -7,8 +7,15 @@ import 'package:firebase_database/firebase_database.dart';
 
 class GuessMeGameScreen extends StatefulWidget {
   final Contact friend;
+  final String gameId;
+  final bool isCreator;
 
-  const GuessMeGameScreen({super.key, required this.friend});
+  const GuessMeGameScreen({
+    super.key,
+    required this.friend,
+    required this.gameId,
+    required this.isCreator,
+  });
 
   @override
   State<GuessMeGameScreen> createState() => _GuessMeGameScreenState();
@@ -18,62 +25,64 @@ class _GuessMeGameScreenState extends State<GuessMeGameScreen> {
   String selectedAnswer = "";
   int currentQuestion = 0;
   int score = 0;
-  String? gameId;
 
   @override
   void initState() {
     super.initState();
-    createGame();
   }
 
   Future<void> saveAnswer(String answer) async {
-    if (gameId == null) return;
+    final currentUser = FirebaseAuth.instance.currentUser;
 
-    await FirebaseDatabase.instance
-        .ref("guessMe/games/$gameId/answers")
-        .child("creator")
-        .child("q${currentQuestion + 1}")
+    if (currentUser == null) {
+      throw Exception("User is not logged in");
+    }
+
+    final gameRef = FirebaseDatabase.instance.ref(
+      "guessMe/games/${widget.gameId}",
+    );
+
+    final snapshot = await gameRef.get();
+
+    if (!snapshot.exists || snapshot.value is! Map) {
+      throw Exception("Game not found");
+    }
+
+    final data = Map<dynamic, dynamic>.from(snapshot.value as Map);
+
+    final creatorUid = data["creatorUid"]?.toString();
+    final friendUid = data["friendUid"]?.toString();
+
+    // Identify which player is answering.
+    final String playerType;
+
+    if (currentUser.uid == creatorUid) {
+      playerType = "creator";
+    } else if (currentUser.uid == friendUid) {
+      playerType = "friend";
+    } else {
+      throw Exception("You are not a participant in this game");
+    }
+
+    // Save the answer under the correct player's account.
+    await gameRef
+        .child("answers/$playerType/q${currentQuestion + 1}")
         .set(answer);
-  }
-
-  Future<void> createGame() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-
-    if (uid == null) return;
-
-    final gameRef =
-    FirebaseDatabase.instance.ref("guessMe/games").push();
-
-    gameId = gameRef.key;
-
-    await gameRef.set({
-      "creatorUid": uid,
-      "friendUid": widget.friend.uid,
-      "friendName": widget.friend.name,
-      "status": "waiting",
-      "createdAt": ServerValue.timestamp,
-    });
   }
 
   final List<Map<String, dynamic>> questions = [
     {
-      "question": "What do you think your friend would choose? 🤔",
+      "question": "What's your favourite drink? ☕",
       "options": ["☕ Coffee", "🍵 Tea", "🥤 Cold Drink"],
     },
     {
-      "question": "What would your friend prefer? 🎮",
+      "question": "What do you enjoy most? 🎮",
       "options": ["🎬 Movies", "🎮 Gaming", "🎵 Music"],
     },
     {
-      "question": "Where would your friend rather go? 🌍",
+      "question": "Where would you love to go? 🌍",
       "options": ["🏖️ Beach", "🏔️ Mountains", "🏙️ City"],
     },
-  ];
-
-  final List<String> correctAnswers = [
-    "☕ Coffee",
-    "🎮 Gaming",
-    "🏔️ Mountains",
   ];
 
   @override
@@ -117,7 +126,11 @@ class _GuessMeGameScreenState extends State<GuessMeGameScreen> {
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Text(
-                questions[currentQuestion]["question"],
+                widget.isCreator
+                    ? questions[currentQuestion]["question"]
+                    : questions[currentQuestion]["question"]
+                          .toString()
+                          .replaceFirst("your", "your friend's"),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 21,
@@ -140,19 +153,136 @@ class _GuessMeGameScreenState extends State<GuessMeGameScreen> {
                 onPressed: selectedAnswer.isEmpty
                     ? null
                     : () async {
-                        await saveAnswer(selectedAnswer);
-                        if (selectedAnswer == correctAnswers[currentQuestion]) {
-                          score++;
+                        try {
+                          await saveAnswer(selectedAnswer);
+                        } catch (e) {
+                          if (!mounted) return;
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Unable to save your answer. Please try again.",
+                              ),
+                            ),
+                          );
+                          return;
                         }
 
-                        setState(() {
-                          if (currentQuestion < questions.length - 1) {
+                        if (currentQuestion < questions.length - 1) {
+                          setState(() {
                             currentQuestion++;
                             selectedAnswer = "";
+                          });
+                        } else {
+                          if (widget.isCreator) {
+                            // Player A has finished answering.
+                            await FirebaseDatabase.instance
+                                .ref("guessMe/games/${widget.gameId}")
+                                .update({
+                                  "creatorAnswersReady": true,
+                                  "phase": "guessing",
+                                });
+
+                            if (!mounted) return;
+
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (dialogContext) => AlertDialog(
+                                title: const Text("Answers Saved! 🎉"),
+                                content: const Text(
+                                  "Your answers are saved. Ask your friend to accept "
+                                  "the invitation and guess your choices!",
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(dialogContext);
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("Done"),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else {
-                            _showResult();
+                            try {
+                              final gameRef = FirebaseDatabase.instance.ref(
+                                "guessMe/games/${widget.gameId}",
+                              );
+
+                              final snapshot = await gameRef.get();
+
+                              if (!snapshot.exists || snapshot.value is! Map) {
+                                throw Exception("Game not found");
+                              }
+
+                              final data = Map<dynamic, dynamic>.from(
+                                snapshot.value as Map,
+                              );
+
+                              // Player A must finish before Player B can score.
+                              if (data["creatorAnswersReady"] != true) {
+                                if (!mounted) return;
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Your friend hasn't finished answering yet!",
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              final answers = Map<dynamic, dynamic>.from(
+                                data["answers"] as Map,
+                              );
+
+                              final creatorAnswers = Map<dynamic, dynamic>.from(
+                                answers["creator"] as Map,
+                              );
+
+                              final friendAnswers = Map<dynamic, dynamic>.from(
+                                answers["friend"] as Map,
+                              );
+
+                              // Compare Player B's guesses with Player A's answers.
+                              int finalScore = 0;
+
+                              for (int i = 1; i <= questions.length; i++) {
+                                if (creatorAnswers["q$i"] ==
+                                    friendAnswers["q$i"]) {
+                                  finalScore++;
+                                }
+                              }
+
+                              // Save the score and mark the game as completed.
+                              await gameRef.update({
+                                "scores/friend": finalScore,
+                                "phase": "completed",
+                              });
+
+                              if (!mounted) return;
+
+                              setState(() {
+                                score = finalScore;
+                              });
+
+                              _showResult();
+                            } catch (e) {
+                              if (!mounted) return;
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Unable to calculate the score. Please try again.",
+                                  ),
+                                ),
+                              );
+                            }
                           }
-                        });
+                        }
                       },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),

@@ -22,26 +22,44 @@ class ChatCantroller extends GetxController {
   final RxList<Contact> filteredContacts = <Contact>[].obs;
 
   Future<void> getContactList() async {
+    print("🔥 Starting contacts load...");
+
     contactList.value = UiState.loading();
-    contactSubscription = FirebaseDatabase.instance
-        .ref("contacts/${FirebaseAuth.instance.currentUser!.uid}")
-        .onValue
-        .listen((event) {
-          if (event.snapshot.children.isEmpty) {
-            contactList.value = UiState.error("no data found");
-            return;
-          }
-          final contacts = event.snapshot.children
-              .map((e) => Contact.fromJson(e))
-              .toList();
 
-          contactList.value = UiState.success(contacts);
+    final contactRef = FirebaseDatabase.instance
+        .ref("contacts/${FirebaseAuth.instance.currentUser!.uid}");
 
-          filteredContacts.assignAll(contacts);
-          print(
-            "=================> ${contactList.value.getDataOrNull()?.length}",
-          );
-        });
+    try {
+      print("🔥 Testing Firebase connection...");
+
+      final testSnapshot = await contactRef
+          .get()
+          .timeout(const Duration(seconds: 10));
+
+      print("🔥 Firebase responded!");
+      print("🔥 Data exists: ${testSnapshot.exists}");
+      print("🔥 Number of contacts: ${testSnapshot.children.length}");
+    } catch (e) {
+      print("❌ Firebase contact test failed: $e");
+    }
+
+    contactSubscription = contactRef.onValue.listen((event) {
+      print("🔥 Firebase contacts response received!");
+
+      if (event.snapshot.children.isEmpty) {
+        contactList.value = UiState.error("no data found");
+        return;
+      }
+
+      final contacts = event.snapshot.children
+          .map((e) => Contact.fromJson(e))
+          .toList();
+
+      print("🔥 Contacts converted: ${contacts.length}");
+
+      contactList.value = UiState.success(contacts);
+      filteredContacts.assignAll(contacts);
+    });
   }
 
   @override

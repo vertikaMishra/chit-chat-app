@@ -48,6 +48,44 @@ class GuessMeController extends GetxController {
     selectedContact.value = contact;
   }
 
+  Future<String?> createGame() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return null;
+    }
+
+    final friend = selectedContact.value;
+
+    if (friend == null || friend.uid == null || friend.uid!.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Please select a friend first",
+      );
+      return null;
+    }
+
+    final gameRef =
+    FirebaseDatabase.instance.ref("guessMe/games").push();
+
+    final gameId = gameRef.key;
+
+    if (gameId == null) {
+      return null;
+    }
+
+    await gameRef.set({
+      "creatorUid": currentUser.uid,
+      "creatorName": currentUser.displayName ?? "Your friend",
+      "friendUid": friend.uid,
+      "friendName": friend.name,
+      "status": "waiting",
+      "createdAt": ServerValue.timestamp,
+    });
+
+    return gameId;
+  }
+
   Future<void> loadContacts() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 

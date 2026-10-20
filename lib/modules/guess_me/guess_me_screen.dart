@@ -66,12 +66,20 @@ class GuessMeScreen extends GetView<GuessMeController> {
                 children: controller.contacts.map((contact) {
                   return _friendCard(
                     name: contact.name ?? "Unknown",
-                    onTap: () {
+                    onTap: () async {
                       controller.selectFriend(contact);
+
+                      final gameId = await controller.createGame();
+
+                      if (gameId == null) {
+                        return;
+                      }
 
                       Get.to(
                             () => GuessMeGameScreen(
                           friend: contact,
+                          gameId: gameId,
+                              isCreator: true,
                         ),
                       );
                     },
